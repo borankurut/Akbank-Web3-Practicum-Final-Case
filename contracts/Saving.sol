@@ -13,6 +13,7 @@ contract Saving{
     }
 
     event moneyAdded(string userName, uint addedAmount);    // money addition event
+    event withdraw(uint amount);                            // money withdraw event
 
     mapping (address => uint) savingsOf;                    // Savings of users
 
@@ -56,6 +57,7 @@ contract Saving{
 
     // adds user to the contract.
     function addUser(User memory user) external onlyOwner{
+        require(!isUser(user.adr), "Already in!");
         users.push(user);
     }
 
@@ -73,5 +75,12 @@ contract Saving{
 
     function showSavingsOf(address adr) public view onlyUser returns(uint){
         return savingsOf[adr];
+    }
+
+    function withdrawMoney(uint amount) external onlyOwner{
+        require(balance >= amount, "Not enough money");
+        payable(owner).transfer(amount);
+        balance -= amount;
+        emit withdraw(amount);
     }
 }
